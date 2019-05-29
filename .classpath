@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Archive/QvxExtension 3/src"/>
+	<classpathentry kind="src" path="JAXB Generation/target/generated-sources/jaxb"/>
+	<classpathentry kind="src" path="us.analytiq.knime.qvx.reader/src"/>
+	<classpathentry kind="lib" path="Archive/qvx.jar"/>
+	<classpathentry kind="lib" path="Archive/QvxExtension 3/qvx.jar"/>
+	<classpathentry kind="lib" path="us.analytiq.knime.qvx.updatesite/artifacts.jar"/>
+	<classpathentry kind="lib" path="us.analytiq.knime.qvx.updatesite/content.jar"/>
+	<classpathentry kind="lib" path="us.analytiq.knime.qvx.updatesite/features/us.analytiq.knime.qvx.feature_1.0.0.201905291218.jar"/>
+	<classpathentry kind="lib" path="us.analytiq.knime.qvx.updatesite/plugins/us.analytiq.knime.qvx.reader_1.0.0.201905291218.jar"/>
+	<classpathentry kind="output" path="us.analytiq.knime.qvx.reader/bin"/>
+</classpath>

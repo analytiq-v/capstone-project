@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/us.analytiq.knime.qvx.feature_1.0.0.201905281145.jar" id="us.analytiq.knime.qvx.feature" version="1.0.0.201905281145">
+   <feature url="features/us.analytiq.knime.qvx.feature_1.0.0.201905291217.jar" id="us.analytiq.knime.qvx.feature" version="1.0.0.201905291217">
       <category name="qlik"/>
    </feature>
    <category-def name="qlik" label="Qlik Connectivity">

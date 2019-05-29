@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="us.analytiq.knime.qvx.feature"
+      id="us.analytiq.knime.qvx.update"
       label="Qvx"
       version="1.0.0.qualifier"
       provider-name="Matthew Belanger and Monica Sangam">
@@ -690,10 +690,8 @@ Public License instead of this License.  But first, please read
 &lt;https://www.gnu.org/licenses/why-not-lgpl.html&gt;.
    </license>
 
-   <plugin
-         id="us.analytiq.knime.qvx.reader"
-         download-size="0"
-         install-size="0"
+   <includes
+         id="us.analytiq.knime.qvx.feature"
          version="0.0.0"/>
 
 </feature>
