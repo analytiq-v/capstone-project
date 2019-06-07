@@ -7,10 +7,10 @@ Bundle-ClassPath: qvxreader.jar
 Bundle-Activator: us.analytiq.knime.qvx.reader.QvxReaderNodePlugin
 Bundle-Vendor: 
  Analytiq, Princeton, NJ
-Require-Bundle: org.eclipse.core.runtime,
- org.knime.workbench.core,
- org.knime.workbench.repository,
- org.knime.base
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,5.0.0)",
+ org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
+ org.knime.workbench.repository;bundle-version="[3.7.0,5.0.0)",
+ org.knime.base;bundle-version="[3.7.0,5.0.0)"
 Bundle-ActivationPolicy: lazy
 Export-Package: us.analytiq.knime.qvx.reader
 
