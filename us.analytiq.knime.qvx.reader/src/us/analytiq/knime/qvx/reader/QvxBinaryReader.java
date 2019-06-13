@@ -95,7 +95,6 @@ public class QvxBinaryReader {
 	
 	BufferedDataTable[] readQvx(URL url, ExecutionContext exec) throws Exception {
 		
-		System.out.println("readQvx()");
 		this.url = url;
 		this.exec = exec;
 		
