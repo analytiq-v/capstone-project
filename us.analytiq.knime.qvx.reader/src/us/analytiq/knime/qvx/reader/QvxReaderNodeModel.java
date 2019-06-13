@@ -3,6 +3,7 @@ package us.analytiq.knime.qvx.reader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -25,7 +26,7 @@ import org.knime.core.node.NodeSettingsWO;
  */
 public class QvxReaderNodeModel extends NodeModel {
         
-	public static final String DEFAULT_PATH = "./";
+	public static final String DEFAULT_PATH = "";
 
 	public static final String CFGKEY_FILE_PATH = "FilePath";
 
@@ -43,9 +44,10 @@ public class QvxReaderNodeModel extends NodeModel {
 
         CheckUtils.checkSourceFile(filepath.getStringValue());
         URL url = FileUtil.toURL(filepath.getStringValue());
+        System.out.println("URL: " + url);
 
         settings.setDataFileLocationAndUpdateTableName(url);
-        settings.setQvxReader(new QvxReader(filepath.getStringValue(), exec));
+        settings.setQvxReader(new QvxReader(url, exec));
         return settings.getQvxReader().getTableData();
     }
 

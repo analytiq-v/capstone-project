@@ -2,6 +2,9 @@ package us.analytiq.knime.qvx.writer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -14,6 +17,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
+import org.knime.core.util.FileUtil;
 
 import us.analytiq.knime.qvx.writer.QvxWriterNodeSettings.OverwritePolicy;
 
@@ -60,8 +64,13 @@ public class QvxWriterNodeModel extends NodeModel {
     protected void writeQvxFile(final BufferedDataTable table) {
     	
     	QvxWriter qvxWriter = new QvxWriter();
-    	String outFileName = mSettings.getFileName();
-    	qvxWriter.writeQvxFile(table, outFileName, mSettings);
+    	try {
+    		URL url = FileUtil.toURL(mSettings.getFileName());
+    		Path localPath = FileUtil.resolveToPath(url);
+    		qvxWriter.writeQvxFile(table, localPath.toString(), mSettings);
+    	}catch(IOException | URISyntaxException e) {
+    		LOGGER.error(e.getMessage());
+    	}   	
     }
 
     @Override

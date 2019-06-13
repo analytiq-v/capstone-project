@@ -36,6 +36,7 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.FileUtil;
 
 import us.analytiq.knime.qvx.jaxb.FieldAttrType;
 import us.analytiq.knime.qvx.jaxb.FieldAttributes;
@@ -44,7 +45,6 @@ import us.analytiq.knime.qvx.jaxb.QvxFieldType;
 import us.analytiq.knime.qvx.jaxb.QvxNullRepresentation;
 import us.analytiq.knime.qvx.jaxb.QvxTableHeader;
 import us.analytiq.knime.qvx.jaxb.QvxTableHeader.Fields.QvxFieldHeader;
-import us.analytiq.knime.qvx.writer.QvxWriterNodeModel;
 
 import static us.analytiq.knime.qvx.jaxb.FieldAttrType.DATE;
 import static us.analytiq.knime.qvx.jaxb.FieldAttrType.FIX;
@@ -75,9 +75,9 @@ public class QvxBinaryReader {
 	private static final byte RS_BYTE = 0x1E;
 	private static final int WEB_STREAM_MAX_SIZE = 16384;
 	
+	private URL url;
 	private QvxTableHeader qvxTableHeader;
 	private List<QvxFieldHeader> fieldHeaders;
-	private String inFileName;
 	private ExecutionContext exec;
 	private String[] fieldNames;
 	private byte[] buffer;
@@ -93,9 +93,10 @@ public class QvxBinaryReader {
 		
 	}
 	
-	BufferedDataTable[] readQvx(String inFileName, ExecutionContext exec) throws IOException {
+	BufferedDataTable[] readQvx(URL url, ExecutionContext exec) throws Exception {
 		
-		this.inFileName = inFileName;
+		System.out.println("readQvx()");
+		this.url = url;
 		this.exec = exec;
 		
 		readQvxTableHeader();
@@ -309,7 +310,7 @@ public class QvxBinaryReader {
 		return true;
 	}
 	
-	private void readQvxTableHeader() throws IOException {
+	private void readQvxTableHeader() throws Exception {
 		
 		/* Reads the entire "inFileName", creates QvxTableHeader object, and stores the location of the
 		 * zero-byte
@@ -340,14 +341,64 @@ public class QvxBinaryReader {
 		}	
 	}
 	
-	private void readInputStreamIntoBuffer() throws IOException {
+	private void readInputStreamIntoBuffer() throws Exception {
 		
-		// Read the entire "inFileName" into a buffer, from either the local file system or Internet
+		String fileName = url.toString();
 		
-		InputStream inputStream = null;
-		if (new File(inFileName).exists()) {
+		if (fileName.startsWith("http")) {
+			readInternetFileIntoBuffer(fileName);
+			return;
+		}
+		
+		fileName = FileUtil.resolveToPath(url).toString();
+		readLocalFileIntoBuffer(fileName);
+	}
+	
+	private void readInternetFileIntoBuffer(String inFileName) {
+
+		/*
+		Keep reading bytes from inStream until the inputStream ends; store these bytes
+		in "bytes", then add every item in bytes to a large "buffer" array. This simulates
+		the act of reading the entire file into one buffer with a single read statement.
+		*/
+		
+		try (InputStream inStream = new BufferedInputStream(new URL(inFileName).openStream())){
 			
-			inputStream = new FileInputStream(inFileName);
+			List<byte[]> bytes = new ArrayList<>();
+			int totalLength = 0;
+			int numRead = 0;
+			int previousRead = 0;
+			byte[] currBuffer = new byte[WEB_STREAM_MAX_SIZE];
+			while ((numRead = inStream.read(currBuffer)) != -1) {
+				previousRead = numRead;
+				bytes.add(currBuffer.clone());
+				totalLength += numRead;
+			}
+			bytes.set(bytes.size()-1, Arrays.copyOfRange(
+				bytes.get(bytes.size()-1), 0, previousRead));		
+			buffer = new byte[totalLength];
+			
+			int idx = 0;
+			for(int i = 0; i < bytes.size(); i++) {
+				currBuffer = bytes.get(i);
+				for (int j = 0; j < currBuffer.length; j++) {
+					buffer[idx++] = currBuffer[j];
+				}
+			}
+		}catch(FileNotFoundException e) {
+			String errorMessage = "File '" + inFileName + "' does not exist";
+			LOGGER.error(errorMessage);
+			throw new RuntimeException(errorMessage);
+		}catch(IOException e) {
+			String errorMessage = "Error reading file '" + inFileName + "'";
+			LOGGER.error(errorMessage);
+			throw new RuntimeException(errorMessage);
+		}	
+	}
+	
+	private void readLocalFileIntoBuffer(String inFileName) throws Exception {
+		
+		try (InputStream inStream = new FileInputStream(inFileName)){
 			
 			//Set bufferSize
 			File f = new File(inFileName);
@@ -355,70 +406,21 @@ public class QvxBinaryReader {
 			
 			//Read "inFileName" into "buffer"
 			buffer = new byte[bufferSize];
-			try {
-				int bytesRead = inputStream.read(buffer);
-				if (bytesRead != buffer.length) {
-					String errorMessage = "Number of bytes read does match buffer size";
-					LOGGER.error(errorMessage);
-					throw new IllegalStateException(errorMessage);
-				}
-			}catch(IOException e) {
-				String errorMessage = "Error reading from buffer";
+			int bytesRead = inStream.read(buffer);
+			if (bytesRead != buffer.length) {
+				String errorMessage = "Number of bytes read does match buffer size";
 				LOGGER.error(errorMessage);
-				throw new RuntimeException(errorMessage);
-			}finally {
-				inputStream.close();
+				throw new IllegalStateException(errorMessage);
 			}
-		}else if (inFileName.startsWith("http")){ //Try finding the file on the Internet
-			
-			try{
-				if (inFileName.startsWith("http")) {
-					inputStream = new BufferedInputStream(new URL(inFileName).openStream());
-					
-					/*Keep reading bytes from inputStream until the inputStream ends; store these bytes
-					in "bytes", then add every item in bytes to a large "buffer" array. This simulates
-					the act of reading the entire file into one buffer with a single read statement.*/
-					
-					List<byte[]> bytes = new ArrayList<>();
-					int totalLength = 0;
-					int numRead = 0;
-					int previousRead = 0;
-					byte[] currBuffer = new byte[WEB_STREAM_MAX_SIZE];
-					while ((numRead = inputStream.read(currBuffer)) != -1) {
-						previousRead = numRead;
-						bytes.add(currBuffer.clone());
-						totalLength += numRead;
-					}
-					bytes.set(bytes.size()-1, Arrays.copyOfRange(
-						bytes.get(bytes.size()-1), 0, previousRead));		
-					buffer = new byte[totalLength];
-					
-					int idx = 0;
-					for(int i = 0; i < bytes.size(); i++) {
-						currBuffer = bytes.get(i);
-						for (int j = 0; j < currBuffer.length; j++) {
-							buffer[idx++] = currBuffer[j];
-						}
-					}						
-				}else {
-					String errorMessage = "File not found: " + inFileName;
-					LOGGER.error(errorMessage);
-					throw new FileNotFoundException(errorMessage);
-				}
-			}catch(FileNotFoundException e2) {
-				String errorMessage = "File not found: " + inFileName;
-				LOGGER.error(errorMessage);
-				throw new FileNotFoundException(errorMessage);
-			}finally {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			}
-		}
-		
-		if (inputStream != null) {
-			inputStream.close();
-		}
+		}catch(FileNotFoundException e) {
+			String errorMessage = "File '" + inFileName + "' does not exist";
+			LOGGER.error(errorMessage);
+			throw new RuntimeException(errorMessage);
+		}catch(IOException e) {
+			String errorMessage = "Error reading file '" + inFileName + "'";
+			LOGGER.error(errorMessage);
+			throw new RuntimeException(errorMessage);
+		}	
 	}
 	
 	private void readBody() {
