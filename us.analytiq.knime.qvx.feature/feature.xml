@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="us.analytiq.knime.qvx.feature"
-      label="Qvx"
+      label="Qlikview Extensions for KNIME"
       version="1.0.0.qualifier"
-      provider-name="Analytiq, Princeton,NJ">
+      provider-name="Analytiq, Princeton, NJ">
 
    <description url="http://www.example.com/description">
       Qvx Reader and Qvx Writer nodes for KNIME
