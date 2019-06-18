@@ -1,6 +1,5 @@
 package us.analytiq.knime.qvx.reader;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
