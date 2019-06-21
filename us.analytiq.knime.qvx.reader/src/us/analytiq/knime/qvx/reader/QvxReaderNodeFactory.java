@@ -5,8 +5,8 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * <code>NodeFactory</code> for the "Qvx" Node.
- * Qvx Node
+ * <code>NodeFactory</code> for the "Qvx Reader" Node.
+ * Qvx Reader Node
  *
  * @author Monica
  */
@@ -26,7 +26,7 @@ public class QvxReaderNodeFactory
      */
     @Override
     public int getNrNodeViews() {
-        return 1;
+        return 0;
     }
 
     /**
@@ -35,7 +35,8 @@ public class QvxReaderNodeFactory
     @Override
     public NodeView<QvxReaderNodeModel> createNodeView(final int viewIndex,
             final QvxReaderNodeModel nodeModel) {
-        return new QvxReaderNodeView(nodeModel);
+
+    	return null;
     }
 
     /**

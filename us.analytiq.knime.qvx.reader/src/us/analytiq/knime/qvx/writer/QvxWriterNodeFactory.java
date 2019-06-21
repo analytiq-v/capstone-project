@@ -26,7 +26,7 @@ public class QvxWriterNodeFactory
      */
     @Override
     public int getNrNodeViews() {
-        return 1;
+        return 3;
     }
 
     /**
@@ -35,7 +35,8 @@ public class QvxWriterNodeFactory
     @Override
     public NodeView<QvxWriterNodeModel> createNodeView(final int viewIndex,
             final QvxWriterNodeModel nodeModel) {
-        return new QvxWriterNodeView(nodeModel);
+
+    	return null;
     }
 
     /**
