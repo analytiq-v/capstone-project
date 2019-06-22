@@ -66,21 +66,5 @@
 		Data table that will be used to generate the qvx file.
 		</inPort>
 	</ports>
-	
-	<views>
-		<view index = "0" name = "Settings">
-		Choose where the qvx file will be saved and set whether or not an existing qvx file should be
-		overwritten.
-		</view>
-		
-		<view index = "1" name = "Field Attributes">
-		Field Attributes specify how QlikView would interpret the data in the output qvx file. For instance,
-		decimal values can be interpreted as money.
-		</view>
-		
-		<view index = "2" name = "Settings">
-		Toggle settings that affect the structure of the data in the output qvx file. These settings
-		have no effect on the actual data values that are stored in the qvx file.
-		</view>
-	</views>	
+
 </knimeNode>
