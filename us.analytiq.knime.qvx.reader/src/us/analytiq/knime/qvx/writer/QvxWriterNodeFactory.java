@@ -26,7 +26,7 @@ public class QvxWriterNodeFactory
      */
     @Override
     public int getNrNodeViews() {
-        return 3;
+        return 0;
     }
 
     /**
